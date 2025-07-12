@@ -19,7 +19,7 @@ export default function SearchBar({ termoBusca, setTermoBusca, onBuscar, onLimpa
     <div>
       <input
         type="text"
-        placeholder="Digite a descrição..."
+        placeholder="Descrição ou TAG"
         value={termoBusca}
         onChange={e => setTermoBusca(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && onBuscar()}

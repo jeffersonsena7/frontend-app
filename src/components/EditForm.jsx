@@ -8,7 +8,7 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
         type="text"
         value={editData['Descrição'] || editData['descrição'] || ''}
         onChange={e => setEditData(prev => ({ ...prev, Descrição: e.target.value }))}
-        placeholder="Descrição ou TAG"
+        placeholder="Descrição"
         className="input-edit"
       />
       {Object.entries(item).map(([chave, valor]) => {
