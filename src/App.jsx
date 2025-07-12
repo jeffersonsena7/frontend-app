@@ -5,6 +5,7 @@ import { normalizeText, converterParaObjetos } from './helpers/utils';
 import SearchBar from './components/SearchBar';
 import CardList from './components/CardList';
 
+
 function App() {
   const [headers, setHeaders] = useState([]);
   const [rows, setRows] = useState([]);
@@ -80,8 +81,12 @@ function App() {
 
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20 }}>      
       <h1>🔍 Busca por Descrição e TAG</h1>
+      <a href="https://www.linkedin.com/in/jefferson-sena-0b347a232/" target="_blank" rel="noopener noreferrer">
+        <p className="assinatura">🌟Jefferson Sena</p>
+      </a>
+      
       <SearchBar
         termoBusca={termoBusca}
         setTermoBusca={setTermoBusca}
@@ -101,7 +106,7 @@ function App() {
         cancelarEdicao={cancelarEdicao}
         iniciarEdicao={iniciarEdicao}
       />
-
+      
     </div>
   );
 }

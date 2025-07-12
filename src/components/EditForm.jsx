@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 export default function EditForm({ item, editData, setEditData, salvarEdicao, cancelarEdicao }) {
   return (
     <>
@@ -28,6 +29,8 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
       <div className="card-footer">
         <button className="detalhes-btn" onClick={salvarEdicao}>Salvar</button>
         <button onClick={cancelarEdicao} style={{ backgroundColor: '#888', marginLeft: 10 }}>Cancelar</button>
+
+        
       </div>
     </>
   );

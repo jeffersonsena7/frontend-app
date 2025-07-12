@@ -14,6 +14,43 @@ body {
   min-height: 100vh;
 }
 
+.assinatura {
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  font-size: 10px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 5px 1px;
+  border-radius: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 999;
+
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: typing 5s steps(15, end) infinite;
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 110px; /* Ajuste ao tamanho do nome */
+  }
+  100% {
+    width: 0;
+  }
+}
+
+
+
+
 /* Container principal */
 div[style] {
   max-width: 900px;
