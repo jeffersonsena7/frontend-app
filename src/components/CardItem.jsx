@@ -2,9 +2,8 @@ import React, { useEffect } from 'react';
 import EditForm from './EditForm';
 import { normalizeText } from '../helpers/utils';
 
-
 export default function CardItem({
-  index, item, editIndex, editData, setEditData, setEditIndex, headers, salvarEdicao, cancelarEdicao, iniciarEdicao
+  index, item, editIndex, editData, setEditData, setEditIndex, headers, salvarEdicao, cancelarEdicao, iniciarEdicao, foto, setFoto, previewFoto, setPreviewFoto
 }) {
   const isEditing = index === editIndex;
 
@@ -30,6 +29,10 @@ export default function CardItem({
           setEditData={setEditData}
           salvarEdicao={salvarEdicao}
           cancelarEdicao={cancelarEdicao}
+          foto={foto}
+          setFoto={setFoto}
+          previewFoto={previewFoto}
+          setPreviewFoto={setPreviewFoto}
         />
       </div>
     );
@@ -38,8 +41,18 @@ export default function CardItem({
   return (
     <div className="card">
       <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
+
+      {/* Mostrar a foto, se existir URL */}
+      {item.fotoUrl && (
+        <img
+          src={item.fotoUrl}
+          alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
+          style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 10 }}
+        />
+      )}
+
       {Object.entries(item).map(([chave, valor], i) => {
-        if (['Descrição', 'descrição'].includes(chave)) return null;
+        if (['Descrição', 'descrição', 'fotoUrl'].includes(chave)) return null;
 
         const isDestaque = ['Tag', 'Potência', 'Código', 'Corrente', 'Tensão'].some(k =>
           normalizeText(k) === normalizeText(chave)

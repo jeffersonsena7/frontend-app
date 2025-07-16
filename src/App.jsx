@@ -14,7 +14,11 @@ function App() {
 
   const [editIndex, setEditIndex] = useState(null);
   const [editData, setEditData] = useState({});
+  
+  const [foto, setFoto] = useState(null);
+  const [previewFoto, setPreviewFoto] = useState(null);
 
+  
   useEffect(() => {
     getPlanilha()
       .then(({ headers, rows }) => {
@@ -50,7 +54,24 @@ function App() {
     setResultados(encontrados);
   };
 
-  const salvarEdicao = () => {
+  const salvarEdicao = async () => {
+  try {
+    let fotoUrl = null;
+
+    if (foto) {
+      const formData = new FormData();
+      formData.append('file', foto);
+      formData.append('upload_preset', 'ml_default'); // substitua pelo seu
+      const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      fotoUrl = data.secure_url;
+
+      editData.fotoUrl = fotoUrl; // adiciona ao objeto
+    }
+
     const novaLinha = headers.map(h => editData[h] ?? '');
     const novosResultados = [...resultados];
     novosResultados[editIndex] = novaLinha;
@@ -66,7 +87,13 @@ function App() {
     setRows(novaRows);
     setEditIndex(null);
     setEditData({});
-  };
+    setFoto(null);
+    setPreviewFoto(null);
+  } catch (error) {
+    alert('Erro ao salvar a edição com foto.');
+    console.error(error);
+  }
+};
 
   const cancelarEdicao = () => {
     setEditIndex(null);
@@ -105,7 +132,12 @@ function App() {
         salvarEdicao={salvarEdicao}
         cancelarEdicao={cancelarEdicao}
         iniciarEdicao={iniciarEdicao}
-      />
+        foto={foto}
+        setFoto={setFoto}
+        previewFoto={previewFoto}
+        setPreviewFoto={setPreviewFoto}
+    />
+
       
     </div>
   );

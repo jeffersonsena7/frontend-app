@@ -223,6 +223,16 @@ button:active {
   transform: scale(1.01);
 }
 
+.foto-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  margin-top: 10px;
+  object-fit: contain;
+  box-shadow: 0 0 10px rgba(100, 181, 246, 0.7);
+}
+
+
 /* Área JSON */
 pre {
   font-family: 'Courier New', Courier, monospace;
@@ -258,3 +268,4 @@ pre::-webkit-scrollbar-thumb {
     grid-template-columns: 1fr;
   }
 }
+
