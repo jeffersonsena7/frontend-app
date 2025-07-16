@@ -48,6 +48,7 @@ function App() {
     );
 
     setResultados(encontrados);
+    setTermoBusca('');
   };
 
   const salvarEdicao = () => {
