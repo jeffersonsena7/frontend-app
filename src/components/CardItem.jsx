@@ -6,8 +6,6 @@ export default function CardItem({
   index, item, editIndex, editData, setEditData, setEditIndex, headers, salvarEdicao, cancelarEdicao, iniciarEdicao, foto, setFoto, previewFoto, setPreviewFoto
 }) {
   const isEditing = index === editIndex;
-
-  // Use ref para controlar se já inicializou o editData
   const initialized = React.useRef(false);
 
   useEffect(() => {
@@ -42,7 +40,7 @@ export default function CardItem({
     <div className="card">
       <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
 
-      {/* Mostrar a foto, se existir URL */}
+      {/* Mostrar a foto, se existir */}
       {item.fotoUrl && (
         <img
           src={item.fotoUrl}
@@ -65,7 +63,6 @@ export default function CardItem({
         );
       })}
       <div className="card-footer">
-        {/* Use iniciarEdicao para garantir que editData é preenchido junto com editIndex */}
         <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
       </div>
     </div>

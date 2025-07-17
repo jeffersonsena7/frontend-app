@@ -5,6 +5,8 @@ import { normalizeText, converterParaObjetos } from './helpers/utils';
 import SearchBar from './components/SearchBar';
 import CardList from './components/CardList';
 
+import axios from 'axios';
+
 
 function App() {
   const [headers, setHeaders] = useState([]);
@@ -55,22 +57,25 @@ function App() {
     setTermoBusca('');
   };
 
-  const salvarEdicao = async () => {
-  try {
-    let fotoUrl = null;
 
+const salvarEdicao = async () => {
+  try {
     if (foto) {
       const formData = new FormData();
       formData.append('file', foto);
-      formData.append('upload_preset', 'ml_default'); // substitua pelo seu
+      formData.append('upload_preset', 'ml_default'); // coloque seu preset correto aqui
       const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
       const data = await res.json();
-      fotoUrl = data.secure_url;
 
-      editData.fotoUrl = fotoUrl; // adiciona ao objeto
+      if (data.secure_url) {
+        editData.fotoUrl = data.secure_url;
+      } else {
+        alert('Erro ao fazer upload da foto');
+        return;
+      }
     }
 
     const novaLinha = headers.map(h => editData[h] ?? '');
@@ -84,6 +89,9 @@ function App() {
       row[indiceTag] === tagEditada ? novaLinha : row
     );
 
+    // Envia para o backend salvar no Excel
+    await axios.post(`${process.env.REACT_APP_API_URL}/api/planilha/salvar`, editData);
+
     setResultados(novosResultados);
     setRows(novaRows);
     setEditIndex(null);
@@ -95,6 +103,7 @@ function App() {
     console.error(error);
   }
 };
+
 
   const cancelarEdicao = () => {
     setEditIndex(null);
