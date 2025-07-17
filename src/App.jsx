@@ -60,55 +60,57 @@ function App() {
 
 const salvarEdicao = async () => {
   try {
+    const formData = new FormData();
+
+    // Adiciona a foto se existir
     if (foto) {
-      const formData = new FormData();
-      formData.append('file', foto);
-      formData.append('upload_preset', 'picturestag'); // coloque seu preset correto aqui
-      const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      
+      formData.append('foto', foto);
+    }
 
-      if (data.secure_url) {
-        editData.fotoUrl = data.secure_url;
-      } else {
-        alert('Erro ao fazer upload da foto');
-        return;
+    // Adiciona todos os campos de editData
+    Object.keys(editData).forEach(key => {
+      formData.append(key, editData[key]);
+    });
+
+    // Faz o POST para o backend com multipart/form-data
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/planilha/salvar`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' }
       }
-    }
-
-     // Garante que a coluna fotoUrl exista nos headers
-    if (!headers.includes('fotoUrl') && editData.fotoUrl) {
-      headers.push('fotoUrl');
-    }
-    
-    const novaLinha = headers.map(h => editData[h] ?? '');
-    const novosResultados = [...resultados];
-    novosResultados[editIndex] = novaLinha;
-
-    const indiceTag = headers.findIndex(h => ['tag', 'TAG', 'Tag'].includes(h));
-    const tagEditada = editData[headers[indiceTag]];
-
-    const novaRows = rows.map(row =>
-      row[indiceTag] === tagEditada ? novaLinha : row
     );
 
-    // Envia para o backend salvar no Excel
-    await axios.post(`${process.env.REACT_APP_API_URL}/api/planilha/salvar`, editData);
+    if (response.data.success) {
+      alert('Dados salvos com sucesso!');
 
-    setResultados(novosResultados);
-    setRows(novaRows);
-    setEditIndex(null);
-    setEditData({});
-    setFoto(null);
-    setPreviewFoto(null);
+      // Atualiza localmente os dados
+      const novaLinha = headers.map(h => editData[h] ?? '');
+      const novosResultados = [...resultados];
+      novosResultados[editIndex] = novaLinha;
+
+      const indiceTag = headers.findIndex(h => ['tag', 'TAG', 'Tag'].includes(h));
+      const tagEditada = editData[headers[indiceTag]];
+
+      const novaRows = rows.map(row =>
+        row[indiceTag] === tagEditada ? novaLinha : row
+      );
+
+      setResultados(novosResultados);
+      setRows(novaRows);
+      setEditIndex(null);
+      setEditData({});
+      setFoto(null);
+      setPreviewFoto(null);
+    } else {
+      alert('Erro ao salvar os dados');
+    }
   } catch (error) {
+    console.error('Erro ao salvar a edição com foto:', error);
     alert('Erro ao salvar a edição com foto.');
-    console.error(error);
   }
 };
+
 
 
   const cancelarEdicao = () => {
