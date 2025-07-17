@@ -1,30 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function EditForm({ item, editData, setEditData, salvarEdicao, cancelarEdicao, foto, setFoto, previewFoto, setPreviewFoto }) {
+
+  const [uploading, setUploading] = useState(false);
 
   const handleUploadFoto = async (file) => {
     if (!file) return;
 
+    setUploading(true);
     const data = new FormData();
     data.append('file', file);
-    data.append('upload_preset', 'ml_default');  // <<< TROQUE AQUI
-    // Exemplo: 'ml_default'
+    data.append('upload_preset', 'picturestag');
 
     try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {  // <<< TROQUE AQUI
+      const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
         method: 'POST',
         body: data,
       });
       const fileData = await res.json();
       if (fileData.secure_url) {
-        setPreviewFoto(fileData.secure_url);  // mostra URL do Cloudinary
-        setEditData(prev => ({ ...prev, fotoUrl: fileData.secure_url }));  // salva URL na edição
+        setPreviewFoto(fileData.secure_url);
+        setEditData(prev => ({ ...prev, fotoUrl: fileData.secure_url }));
       } else {
         alert('Erro no upload da foto');
       }
     } catch (err) {
       alert('Erro no upload da foto');
       console.error(err);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -33,8 +37,18 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
     if (!file) return;
 
     setFoto(file);
-    // Ao invés de ler local, já faz upload pra Cloudinary
     handleUploadFoto(file);
+  };
+
+  // Função para apagar foto
+  const apagarFoto = () => {
+    setFoto(null);
+    setPreviewFoto(null);
+    setEditData(prev => {
+      const copy = { ...prev };
+      delete copy.fotoUrl;  // remove a propriedade fotoUrl se existir
+      return copy;
+    });
   };
 
   return (
@@ -71,8 +85,9 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
           capture="environment"
           onChange={handleChangeFile}
         />
+        {uploading && <p>Enviando foto...</p>}
         {previewFoto && (
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 10, position: 'relative', display: 'inline-block' }}>
             <p><strong>Pré-visualização:</strong></p>
             <img
               src={previewFoto}
@@ -80,6 +95,28 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
               className='foto-preview'
               style={{ maxWidth: '100%', borderRadius: 8 }}
             />
+            {/* Botão pequeno para apagar foto */}
+            <button
+              onClick={apagarFoto}
+              style={{
+                position: 'absolute',
+                top: 5,
+                right: 5,
+                backgroundColor: '#ff4d4d',
+                border: 'none',
+                color: 'white',
+                borderRadius: '50%',
+                width: 25,
+                height: 25,
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                lineHeight: '20px',
+                padding: 0,
+              }}
+              title="Apagar foto"
+            >
+              ×
+            </button>
           </div>
         )}
       </div>
