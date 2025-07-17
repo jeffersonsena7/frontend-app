@@ -63,12 +63,13 @@ const salvarEdicao = async () => {
     if (foto) {
       const formData = new FormData();
       formData.append('file', foto);
-      formData.append('upload_preset', 'ml_default'); // coloque seu preset correto aqui
+      formData.append('upload_preset', 'picturestag'); // coloque seu preset correto aqui
       const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
         method: 'POST',
         body: formData,
       });
       const data = await res.json();
+      
 
       if (data.secure_url) {
         editData.fotoUrl = data.secure_url;
@@ -78,6 +79,11 @@ const salvarEdicao = async () => {
       }
     }
 
+     // Garante que a coluna fotoUrl exista nos headers
+    if (!headers.includes('fotoUrl') && editData.fotoUrl) {
+      headers.push('fotoUrl');
+    }
+    
     const novaLinha = headers.map(h => editData[h] ?? '');
     const novosResultados = [...resultados];
     novosResultados[editIndex] = novaLinha;
