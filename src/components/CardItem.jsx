@@ -3,7 +3,9 @@ import EditForm from './EditForm';
 import { normalizeText } from '../helpers/utils';
 
 export default function CardItem({
-  index, item, editIndex, editData, setEditData, setEditIndex, headers, salvarEdicao, cancelarEdicao, iniciarEdicao, foto, setFoto, previewFoto, setPreviewFoto
+  index, item, editIndex, editData, setEditData, setEditIndex, headers,
+  salvarEdicao, cancelarEdicao, iniciarEdicao,
+  foto, setFoto, previewFoto, setPreviewFoto
 }) {
   const isEditing = index === editIndex;
   const initialized = React.useRef(false);
@@ -32,6 +34,15 @@ export default function CardItem({
           previewFoto={previewFoto}
           setPreviewFoto={setPreviewFoto}
         />
+
+        {/* Mostrar preview da nova foto escolhida */}
+        {previewFoto && (
+          <img
+            src={previewFoto}
+            alt="Pré-visualização"
+            style={{ maxWidth: '100%', borderRadius: 8, marginTop: 10 }}
+          />
+        )}
       </div>
     );
   }
@@ -40,7 +51,7 @@ export default function CardItem({
     <div className="card">
       <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
 
-      {/* Mostrar a foto, se existir */}
+      {/* ✅ Mostrar a foto, se houver link */}
       {item.fotoUrl && (
         <img
           src={item.fotoUrl}
@@ -62,6 +73,7 @@ export default function CardItem({
           </div>
         );
       })}
+
       <div className="card-footer">
         <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
       </div>
