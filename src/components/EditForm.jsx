@@ -11,6 +11,7 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
     const data = new FormData();
     data.append('file', file);
     data.append('upload_preset', 'picturestag');
+    data.append('folder', 'equipamentos');
 
     try {
       const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
