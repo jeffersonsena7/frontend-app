@@ -69,7 +69,7 @@ const salvarEdicao = async () => {
         body: formData,
       });
       const data = await res.json();
-      
+      console.log('Resposta Cloudinary:', data);
 
       if (data.secure_url) {
         editData.fotoUrl = data.secure_url;
