@@ -21,8 +21,10 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
       });
       const fileData = await res.json();
       if (fileData.secure_url) {
+        console.log('👉 URL Cloudinary:', fileData.secure_url);
         setPreviewFoto(fileData.secure_url);
         setEditData(prev => ({ ...prev, fotoUrl: fileData.secure_url }));
+        console.log('👉 editData no EditForm:', novo);
       } else {
         alert('Erro no upload da foto');
       }

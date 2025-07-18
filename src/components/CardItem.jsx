@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import EditForm from './EditForm';
 import { normalizeText } from '../helpers/utils';
 
@@ -7,6 +7,7 @@ export default function CardItem({
   salvarEdicao, cancelarEdicao, iniciarEdicao,
   foto, setFoto, previewFoto, setPreviewFoto
 }) {
+  const [isImageValid, setIsImageValid] = useState(true);
   const isEditing = index === editIndex;
   const initialized = React.useRef(false);
 
@@ -19,6 +20,12 @@ export default function CardItem({
       initialized.current = false;
     }
   }, [isEditing, item, setEditData]);
+
+  const handleImageError = () => {
+    setIsImageValid(false);
+  };
+
+  const imageUrl = item.fotoUrl || 'caminho/para/imagem-padrao.jpg';
 
   if (isEditing) {
     return (
@@ -34,8 +41,6 @@ export default function CardItem({
           previewFoto={previewFoto}
           setPreviewFoto={setPreviewFoto}
         />
-
-        {/* Mostrar preview da nova foto escolhida */}
         {previewFoto && (
           <img
             src={previewFoto}
@@ -50,16 +55,12 @@ export default function CardItem({
   return (
     <div className="card">
       <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
-
-      {/* ✅ Mostrar a foto, se houver link */}
-      {item.fotoUrl && (
-        <img
-          src={item.fotoUrl}
-          alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
-          style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 10 }}
-        />
-      )}
-
+      <img
+        src={isImageValid ? imageUrl : 'caminho/para/imagem-padrao.jpg'}
+        alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
+        onError={handleImageError}
+        style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 10 }}
+      />
       {Object.entries(item).map(([chave, valor], i) => {
         if (['Descrição', 'descrição', 'fotoUrl'].includes(chave)) return null;
 
@@ -73,7 +74,6 @@ export default function CardItem({
           </div>
         );
       })}
-
       <div className="card-footer">
         <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
       </div>
