@@ -13,7 +13,6 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
     data.append('upload_preset', 'picturestag');
     data.append('folder', 'equipamentos');
 
-
     try {
       const res = await fetch('https://api.cloudinary.com/v1_1/do6fz60dx/image/upload', {
         method: 'POST',
@@ -24,7 +23,13 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
         console.log('👉 URL Cloudinary:', fileData.secure_url);
         setPreviewFoto(fileData.secure_url);
         setEditData(prev => ({ ...prev, fotoUrl: fileData.secure_url }));
-        console.log('👉 editData no EditForm:', novo);
+        
+        console.log('👉 editData no EditForm:', {
+          ...editData,
+          fotoUrl: fileData.secure_url
+        });
+
+
       } else {
         alert('Erro no upload da foto');
       }
