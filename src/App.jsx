@@ -62,17 +62,23 @@ const salvarEdicao = async () => {
   try {
     const formData = new FormData();
 
-    // Adiciona a foto se existir
-    if (foto) {
-      formData.append('foto', foto);
+     // Se tiver uma URL da foto, adiciona no formData
+    if (editData.fotoUrl) {
+      formData.append('fotoUrl', editData.fotoUrl);
     }
 
-    // Adiciona todos os campos de editData
+    // Adiciona a foto se existir
+    // if (foto) {
+    //   formData.append('foto', foto);
+    // }
+
+     // Adiciona os demais campos do editData
     Object.keys(editData).forEach(key => {
-      formData.append(key, editData[key]);
+      if (key !== 'fotoUrl') { // Evita duplicar
+        formData.append(key, editData[key]);
+      }
     });
 
-    // Faz o POST para o backend com multipart/form-data
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/api/planilha/salvar`,
       formData,
@@ -84,7 +90,6 @@ const salvarEdicao = async () => {
     if (response.data.success) {
       alert('Dados salvos com sucesso!');
 
-      // Atualiza localmente os dados
       const novaLinha = headers.map(h => editData[h] ?? '');
       const novosResultados = [...resultados];
       novosResultados[editIndex] = novaLinha;
