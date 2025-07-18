@@ -25,7 +25,7 @@ export default function CardItem({
     setIsImageValid(false);
   };
 
-  const imageUrl = item.fotoUrl || 'caminho/para/imagem-padrao.jpg';
+  const imageUrl = item.fotoURL || 'caminho/para/imagem-padrao.jpg';
 
   if (isEditing) {
     return (

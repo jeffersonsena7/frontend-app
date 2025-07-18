@@ -63,8 +63,8 @@ const salvarEdicao = async () => {
     const formData = new FormData();
 
      // Se tiver uma URL da foto, adiciona no formData
-    if (editData.fotoUrl) {
-      formData.append('fotoUrl', editData.fotoUrl);
+    if (editData.fotoURL) {
+      formData.append('fotoUrl', editData.fotoURL);
     }
 
     // Adiciona a foto se existir

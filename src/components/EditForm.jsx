@@ -22,11 +22,11 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
       if (fileData.secure_url) {
         console.log('👉 URL Cloudinary:', fileData.secure_url);
         setPreviewFoto(fileData.secure_url);
-        setEditData(prev => ({ ...prev, fotoUrl: fileData.secure_url }));
+        setEditData(prev => ({ ...prev, fotoURL: fileData.secure_url }));
         
         console.log('👉 editData no EditForm:', {
           ...editData,
-          fotoUrl: fileData.secure_url
+          fotoURL: fileData.secure_url
         });
 
 
@@ -55,7 +55,7 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
     setPreviewFoto(null);
     setEditData(prev => {
       const copy = { ...prev };
-      delete copy.fotoUrl;  // remove a propriedade fotoUrl se existir
+      delete copy.fotoURL;  // remove a propriedade fotoURL se existir
       return copy;
     });
   };
