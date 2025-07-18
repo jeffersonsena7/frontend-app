@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 
-export default function EditForm({ item, editData, setEditData, salvarEdicao, cancelarEdicao, foto, setFoto, previewFoto, setPreviewFoto }) {
-
+export default function EditForm({
+  item,
+  editData,
+  setEditData,
+  salvarEdicao,
+  cancelarEdicao,
+  foto,
+  setFoto,
+  previewFoto,
+  setPreviewFoto
+}) {
   const [uploading, setUploading] = useState(false);
 
   const handleUploadFoto = async (file) => {
@@ -18,18 +27,24 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
         method: 'POST',
         body: data,
       });
+
       const fileData = await res.json();
+
       if (fileData.secure_url) {
         console.log('👉 URL Cloudinary:', fileData.secure_url);
+
         setPreviewFoto(fileData.secure_url);
-        setEditData(prev => ({ ...prev, fotoURL: fileData.secure_url }));
-        
+        setEditData(prev => ({
+          ...prev,
+          fotoURL: fileData.secure_url,
+          publicId: fileData.public_id // ← salvando publicId
+        }));
+
         console.log('👉 editData no EditForm:', {
           ...editData,
-          fotoURL: fileData.secure_url
+          fotoURL: fileData.secure_url,
+          publicId: fileData.public_id
         });
-
-
       } else {
         alert('Erro no upload da foto');
       }
@@ -49,13 +64,14 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
     handleUploadFoto(file);
   };
 
-  // Função para apagar foto
+  // Apagar a foto do estado (local)
   const apagarFoto = () => {
     setFoto(null);
     setPreviewFoto(null);
     setEditData(prev => {
       const copy = { ...prev };
-      delete copy.fotoURL;  // remove a propriedade fotoURL se existir
+      delete copy.fotoURL;
+      delete copy.publicId;
       return copy;
     });
   };
@@ -69,6 +85,7 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
         placeholder="Descrição"
         className="input-edit"
       />
+
       {Object.entries(item).map(([chave, valor]) => {
         if (['Descrição', 'descrição'].includes(chave)) return null;
 
@@ -95,45 +112,90 @@ export default function EditForm({ item, editData, setEditData, salvarEdicao, ca
           onChange={handleChangeFile}
         />
         {uploading && <p>Enviando foto...</p>}
-        {previewFoto && (
-          <div style={{ marginTop: 10, position: 'relative', display: 'inline-block' }}>
-            <p><strong>Pré-visualização:</strong></p>
-            <img
-              src={previewFoto}
-              alt="Prévia da Foto"
-              className='foto-preview'
-              style={{ maxWidth: '100%', borderRadius: 8 }}
-            />
-            {/* Botão pequeno para apagar foto */}
-            <button
-              onClick={apagarFoto}
-              style={{
-                position: 'absolute',
-                top: 5,
-                right: 5,
-                backgroundColor: '#ff4d4d',
-                border: 'none',
-                color: 'white',
-                borderRadius: '50%',
-                width: 25,
-                height: 25,
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                lineHeight: '20px',
-                padding: 0,
-              }}
-              title="Apagar foto"
-            >
-              ×
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="card-footer">
         <button className="detalhes-btn" onClick={salvarEdicao}>Salvar</button>
         <button onClick={cancelarEdicao} style={{ backgroundColor: '#888', marginLeft: 10 }}>Cancelar</button>
       </div>
+
+      {/* Preview da imagem e botões de ação */}
+      {previewFoto && (
+        <div style={{ marginTop: 20, position: 'relative', display: 'inline-block' }}>
+          <p><strong>Pré-visualização da foto:</strong></p>
+          <img
+            src={previewFoto}
+            alt="Prévia da Foto"
+            className='foto-preview'
+            style={{ maxWidth: '150px', borderRadius: 8 }}
+          />
+
+          {/* Botão para apagar localmente */}
+          <button
+            onClick={apagarFoto}
+            style={{
+              position: 'absolute',
+              top: 5,
+              right: 5,
+              backgroundColor: '#ff4d4d',
+              border: 'none',
+              color: 'white',
+              borderRadius: '50%',
+              width: 25,
+              height: 25,
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              lineHeight: '20px',
+              padding: 0,
+            }}
+            title="Apagar localmente"
+          >
+            ×
+          </button>
+
+          {/* Botão para remover da nuvem */}
+{editData.publicId && (
+  <button
+    onClick={async () => {
+      const confirmar = window.confirm('Remover a imagem da nuvem e da planilha?');
+      if (!confirmar) return;
+
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/planilha/remover-foto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId: editData.publicId })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert('Imagem removida com sucesso da nuvem!');
+          apagarFoto(); // remove do estado local
+        } else {
+          alert('Erro ao remover imagem da nuvem.');
+        }
+      } catch (err) {
+        alert('Erro ao conectar com o servidor.');
+        console.error(err);
+      }
+    }}
+    style={{
+      marginTop: 10,
+      backgroundColor: '#e53935',
+      color: 'white',
+      border: 'none',
+      padding: '6px 12px',
+      borderRadius: 4,
+      cursor: 'pointer'
+    }}
+  >
+    🗑️ Remover da nuvem e planilha
+  </button>
+)}
+
+        </div>
+      )}
     </>
   );
 }
