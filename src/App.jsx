@@ -24,6 +24,7 @@ function App() {
   useEffect(() => {
     getPlanilha()
       .then(({ headers, rows }) => {
+        console.log('dados da planilha', {headers, rows})
         setHeaders(headers);
         setRows(rows);
       })
