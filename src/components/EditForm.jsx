@@ -86,14 +86,14 @@ export default function EditForm({
     <>
       <input
         type="text"
-        value={editData['Descrição'] || editData['descrição'] || ''}
+        value={editData['Descricao'] || editData['descricao'] || ''}
         onChange={e => setEditData(prev => ({ ...prev, Descrição: e.target.value }))}
         placeholder="Descrição"
         className="input-edit"
       />
 
       {Object.entries(item).map(([chave]) => {
-        if (['Descrição', 'descrição'].includes(chave)) return null;
+        if (['Descricao', 'descricao'].includes(chave)) return null;
 
         return (
           <div key={chave} className="card-item">
