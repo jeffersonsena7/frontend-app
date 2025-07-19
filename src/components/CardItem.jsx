@@ -57,7 +57,7 @@ export default function CardItem({
 
       const chaveNormalizada = normalizeText(chave);
 
-      if (['Descrição', 'descrição', 'fotourl', 'publicid'].includes(chaveNormalizada)) 
+      if (['Descrição', 'descrição', 'fotourl', 'publicid', 'numero'].includes(chaveNormalizada)) 
         return null;
 
       const isDestaque = ['Tag', 'Potência', 'Código', 'Corrente', 'Tensão'].some(k =>
