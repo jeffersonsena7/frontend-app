@@ -11,6 +11,8 @@ export default function CardItem({
   const isEditing = index === editIndex;
   const initialized = React.useRef(false);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   useEffect(() => {
     if (isEditing && !initialized.current) {
       setEditData(item);
@@ -156,15 +158,27 @@ export default function CardItem({
       );
     })}
 
-    {/* 👉 IMAGEM AGORA AQUI EMBAIXO */}
-    <div style={{ marginTop: 10 }}>
-      <img
-        src={isImageValid ? imageUrl : 'caminho/para/imagem-padrao.jpg'}
-        alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
-        onError={handleImageError}
-        style={{ maxWidth: '30%', borderRadius: 8 }}
-      />
-    </div>
+    {isImageValid && (
+  <div className="card-imagem-wrapper">
+    <img
+      src={imageUrl}
+      alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
+      onError={handleImageError}
+      className={`card-imagem ${isFullscreen ? 'fullscreen' : ''}`}
+      onClick={() => setIsFullscreen(prev => !prev)}
+    />
+    <button
+      className="btn-expandir"
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsFullscreen(prev => !prev);
+      }}
+      title={isFullscreen ? 'Voltar' : 'Expandir'}
+    >
+      {isFullscreen ? '🔙' : '🔍'}
+    </button>
+  </div>
+)}
 
     <div className="card-footer">
       <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
