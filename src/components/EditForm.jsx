@@ -13,7 +13,7 @@ export default function EditForm({
 }) {
   const [uploading, setUploading] = useState(false);
 
-   // Adicione este useEffect para sincronizar previewFoto com editData.fotoURL
+  // Sincroniza previewFoto com editData.fotoURL
   useEffect(() => {
     if (editData.fotoURL) {
       setPreviewFoto(editData.fotoURL);
@@ -21,7 +21,6 @@ export default function EditForm({
       setPreviewFoto(null);
     }
   }, [editData.fotoURL]);
-
 
   const handleUploadFoto = async (file) => {
     if (!file) return;
@@ -47,7 +46,7 @@ export default function EditForm({
         setEditData(prev => ({
           ...prev,
           fotoURL: fileData.secure_url,
-          publicId: fileData.public_id // ← salvando publicId
+          publicId: fileData.public_id // salva publicId
         }));
 
         console.log('👉 editData no EditForm:', {
@@ -74,7 +73,14 @@ export default function EditForm({
     handleUploadFoto(file);
   };
 
-
+  // Função para obter o valor da tag (chave pode variar)
+  const obterTag = () => {
+    const possiveisTags = ['tag', 'TAG', 'Tag'];
+    for (const chave of possiveisTags) {
+      if (editData[chave]) return editData[chave];
+    }
+    return null;
+  };
 
   return (
     <>
@@ -86,7 +92,7 @@ export default function EditForm({
         className="input-edit"
       />
 
-      {Object.entries(item).map(([chave, valor]) => {
+      {Object.entries(item).map(([chave]) => {
         if (['Descrição', 'descrição'].includes(chave)) return null;
 
         return (
@@ -114,105 +120,107 @@ export default function EditForm({
         {uploading && <p>Enviando foto...</p>}
       </div>
 
-      {/* IMAGEM DE PRÉ-VISUALIZAÇÃO AGORA AQUI EMBAIXO */}
-        {previewFoto && (
-          <div style={{ marginTop: 20, position: 'relative', display: 'inline-block' }}>
-            <p><strong>Pré-visualização da foto:</strong></p>
-            <img
-              src={previewFoto}
-              alt="Prévia da Foto"
-              className='foto-preview'
-              style={{ maxWidth: '150px', borderRadius: 8 }}
-            />
+      {/* IMAGEM DE PRÉ-VISUALIZAÇÃO */}
+      {previewFoto && (
+        <div style={{ marginTop: 20, position: 'relative', display: 'inline-block' }}>
+          <p><strong>Pré-visualização da foto:</strong></p>
+          <img
+            src={previewFoto}
+            alt="Prévia da Foto"
+            className='foto-preview'
+            style={{ maxWidth: '150px', borderRadius: 8 }}
+          />
 
-            {/* Botão para apagar localmente */}
+          {/* Botão para apagar localmente */}
+          <button
+            onClick={() => {
+              setFoto(null);
+              setPreviewFoto(null);
+              setEditData(prev => {
+                const copy = { ...prev };
+                delete copy.fotoURL;
+                delete copy.publicId;
+                return copy;
+              });
+            }}
+            style={{
+              position: 'absolute',
+              top: 5,
+              right: 5,
+              backgroundColor: '#ff4d4d',
+              border: 'none',
+              color: 'white',
+              borderRadius: '50%',
+              width: 25,
+              height: 25,
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              lineHeight: '20px',
+              padding: 0,
+            }}
+            title="Apagar localmente"
+          >
+            ×
+          </button>
+
+          {/* Botão para remover da nuvem e planilha */}
+          {editData.publicId && (
             <button
-              onClick={() => {
-                setFoto(null);
-                setPreviewFoto(null);
-                setEditData(prev => {
-                  const copy = { ...prev };
-                  delete copy.fotoURL;
-                  delete copy.publicId;
-                  return copy;
-                });
+              onClick={async () => {
+                const confirmar = window.confirm('Remover a imagem da nuvem e da planilha?');
+                if (!confirmar) return;
+
+                const tag = obterTag();
+                if (!tag) {
+                  alert('Tag não encontrada para remover a foto.');
+                  return;
+                }
+
+                try {
+                  const res = await fetch(`${process.env.REACT_APP_API_URL}/api/planilha/foto/${tag}`, {
+                    method: 'DELETE',
+                  });
+
+                  const data = await res.json();
+
+                  if (data.success) {
+                    alert('Imagem removida com sucesso da nuvem e planilha!');
+                    setFoto(null);
+                    setPreviewFoto(null);
+                    setEditData(prev => {
+                      const copy = { ...prev };
+                      delete copy.fotoURL;
+                      delete copy.publicId;
+                      return copy;
+                    });
+                  } else {
+                    alert('Erro ao remover imagem da nuvem.');
+                  }
+                } catch (err) {
+                  alert('Erro ao conectar com o servidor.');
+                  console.error(err);
+                }
               }}
               style={{
-                position: 'absolute',
-                top: 5,
-                right: 5,
-                backgroundColor: '#ff4d4d',
-                border: 'none',
+                marginTop: 10,
+                backgroundColor: '#e53935',
                 color: 'white',
-                borderRadius: '50%',
-                width: 25,
-                height: 25,
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                lineHeight: '20px',
-                padding: 0,
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 4,
+                cursor: 'pointer'
               }}
-              title="Apagar localmente"
             >
-              ×
+              🗑️ Remover da nuvem e planilha
             </button>
-
-            {/* Botão para remover da nuvem */}
-            {editData.publicId && (
-              <button
-                onClick={async () => {
-                  const confirmar = window.confirm('Remover a imagem da nuvem e da planilha?');
-                  if (!confirmar) return;
-
-                  try {
-                    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/planilha/remover-foto`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ publicId: editData.publicId })
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success) {
-                      alert('Imagem removida com sucesso da nuvem!');
-                      setFoto(null);
-                      setPreviewFoto(null);
-                      setEditData(prev => {
-                        const copy = { ...prev };
-                        delete copy.fotoURL;
-                        delete copy.publicId;
-                        return copy;
-                      });
-                    } else {
-                      alert('Erro ao remover imagem da nuvem.');
-                    }
-                  } catch (err) {
-                    alert('Erro ao conectar com o servidor.');
-                    console.error(err);
-                  }
-                }}
-                style={{
-                  marginTop: 10,
-                  backgroundColor: '#e53935',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: 4,
-                  cursor: 'pointer'
-                }}
-              >
-                🗑️ Remover da nuvem e planilha
-              </button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
       <div className="card-footer">
         <button className="detalhes-btn" onClick={salvarEdicao}>Salvar</button>
         <button onClick={cancelarEdicao} style={{ backgroundColor: '#888', marginLeft: 10 }}>Cancelar</button>
       </div>
-
-      
     </>
   );
 }
