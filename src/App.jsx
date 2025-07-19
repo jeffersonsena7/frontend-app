@@ -7,6 +7,7 @@ import CardList from './components/CardList';
 
 import axios from 'axios';
 
+
 function App() {
   const [headers, setHeaders] = useState([]);
   const [rows, setRows] = useState([]);
@@ -19,6 +20,7 @@ function App() {
   const [foto, setFoto] = useState(null);
   const [previewFoto, setPreviewFoto] = useState(null);
 
+  
   useEffect(() => {
     getPlanilha()
       .then(({ headers, rows }) => {
@@ -55,75 +57,78 @@ function App() {
     setTermoBusca('');
   };
 
-  const salvarEdicao = async () => {
-    try {
-      const formData = new FormData();
 
-      if (editData.fotoURL) {
-        formData.append('fotoUrl', editData.fotoURL);
+const salvarEdicao = async () => {
+  try {
+    const formData = new FormData();
+
+     // Se tiver uma URL da foto, adiciona no formData
+    if (editData.fotoURL) {
+      formData.append('fotoUrl', editData.fotoURL);
+    }
+
+    // Adiciona a foto se existir
+    // if (foto) {
+    //   formData.append('foto', foto);
+    // }
+
+     // Adiciona os demais campos do editData
+    Object.keys(editData).forEach(key => {
+      if (key !== 'fotoUrl') { // Evita duplicar
+        formData.append(key, editData[key]);
       }
+    });
 
-      Object.keys(editData).forEach(key => {
-        if (key !== 'fotoUrl') {
-          formData.append(key, editData[key]);
-        }
-      });
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/planilha/salvar`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+    );
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/planilha/salvar`,
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        }
+    if (response.data.success) {
+      alert('Dados salvos com sucesso!');
+
+      const novaLinha = headers.map(h => editData[h] ?? '');
+      const novosResultados = [...resultados];
+      novosResultados[editIndex] = novaLinha;
+
+      const indiceTag = headers.findIndex(h => ['tag', 'TAG', 'Tag'].includes(h));
+      const tagEditada = editData[headers[indiceTag]];
+
+      const novaRows = rows.map(row =>
+        row[indiceTag] === tagEditada ? novaLinha : row
       );
 
-      if (response.data.success) {
-        alert('Dados salvos com sucesso!');
-
-        // Normaliza as chaves para garantir o mapeamento correto
-        const novaLinha = headers.map(h => {
-          if (editData[h] !== undefined) return editData[h];
-          const keyNormalized = h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          const foundKey = Object.keys(editData).find(k =>
-            k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === keyNormalized
-          );
-          return foundKey ? editData[foundKey] : '';
-        });
-
-        const novaRows = [...rows];
-        novaRows[editIndex] = novaLinha;
-
-        const novosResultados = [...resultados];
-        novosResultados[editIndex] = novaLinha;
-
-        setRows(novaRows);
-        setResultados(novosResultados);
-
-        setEditIndex(null);
-        setEditData({});
-        setFoto(null);
-        setPreviewFoto(null);
-      } else {
-        alert('Erro ao salvar os dados');
-      }
-    } catch (error) {
-      console.error('Erro ao salvar a edição com foto:', error);
-      alert('Erro ao salvar a edição com foto.');
+      setResultados(novosResultados);
+      setRows(novaRows);
+      setEditIndex(null);
+      setEditData({});
+      setFoto(null);
+      setPreviewFoto(null);
+    } else {
+      alert('Erro ao salvar os dados');
     }
-  };
+  } catch (error) {
+    console.error('Erro ao salvar a edição com foto:', error);
+    alert('Erro ao salvar a edição com foto.');
+  }
+};
+
+
 
   const cancelarEdicao = () => {
     setEditIndex(null);
     setEditData({});
-    setFoto(null);
-    setPreviewFoto(null);
   };
 
   const iniciarEdicao = (index) => {
-    const item = converterParaObjetos(resultados, headers)[index];
-    setEditIndex(index);
-    setEditData(item);
-  };
+  const item = converterParaObjetos(resultados, headers)[index];
+  setEditIndex(index);
+  setEditData(item);
+};
+
 
   return (
     <div style={{ padding: 20 }}>      
@@ -154,7 +159,9 @@ function App() {
         setFoto={setFoto}
         previewFoto={previewFoto}
         setPreviewFoto={setPreviewFoto}
-      />
+    />
+
+      
     </div>
   );
 }
