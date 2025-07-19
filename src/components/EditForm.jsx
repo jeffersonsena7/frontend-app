@@ -74,17 +74,7 @@ export default function EditForm({
     handleUploadFoto(file);
   };
 
-  // Apagar a foto do estado (local)
-  const apagarFoto = () => {
-    setFoto(null);
-    setPreviewFoto(null);
-    setEditData(prev => {
-      const copy = { ...prev };
-      delete copy.fotoURL;
-      delete copy.publicId;
-      return copy;
-    });
-  };
+
 
   return (
     <>

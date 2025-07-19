@@ -145,7 +145,7 @@ export default function CardItem({
     <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
 
     {Object.entries(item).map(([chave, valor], i) => {
-      if (['Descrição', 'descrição', 'fotoUrl'].includes(chave)) return null;
+      if (['Descrição', 'descrição'].includes(chave)) return null;
 
       const isDestaque = ['Tag', 'Potência', 'Código', 'Corrente', 'Tensão'].some(k =>
         normalizeText(k) === normalizeText(chave)
