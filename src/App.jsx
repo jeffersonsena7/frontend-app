@@ -31,31 +31,37 @@ function App() {
   }, []);
 
   const buscar = () => {
-    if (!termoBusca.trim()) return alert('Digite uma palavra para buscar');
-    const termo = normalizeText(termoBusca);
+  if (!termoBusca.trim()) return alert('Digite uma palavra para buscar');
+  const termo = normalizeText(termoBusca);
 
-    const colunasAlvo = ['descricao', 'descrição', 'denominacao', 'denominação', 'tag'];
-    const colunasRelevantes = headers
-      .map((header, index) => ({
-        nome: normalizeText(header),
-        index
-      }))
-      .filter(h => colunasAlvo.some(padrao => h.nome.includes(padrao)));
+  const colunasAlvo = ['descricao', 'descrição', 'denominacao', 'denominação', 'tag'].map(normalizeText);
 
-    if (colunasRelevantes.length === 0) {
-      return alert('Nenhuma coluna "Descrição", "Tag" ou "Denominação" encontrada.');
-    }
+  console.log('Headers originais:', headers);
+  const colunasNormalizadas = headers.map(h => normalizeText(h));
+  console.log('Headers normalizados:', colunasNormalizadas);
 
-    const encontrados = rows.filter(row =>
-      colunasRelevantes.some(({ index }) => {
-        const valor = row[index];
-        return normalizeText(valor).includes(termo);
-      })
-    );
+  const colunasRelevantes = colunasNormalizadas
+    .map((nome, index) => ({ nome, index }))
+    .filter(h => colunasAlvo.includes(h.nome));
 
-    setResultados(encontrados);
-    setTermoBusca('');
-  };
+  console.log('Colunas relevantes encontradas:', colunasRelevantes);
+
+  if (colunasRelevantes.length === 0) {
+    return alert('Nenhuma coluna "Descrição", "Tag" ou "Denominação" encontrada.');
+  }
+
+  const encontrados = rows.filter(row =>
+    colunasRelevantes.some(({ index }) => {
+      const valor = row[index];
+      return normalizeText(valor).includes(termo);
+    })
+  );
+
+  setResultados(encontrados);
+  setTermoBusca('');
+};
+
+
 
 
 const salvarEdicao = async () => {
