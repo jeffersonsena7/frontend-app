@@ -139,30 +139,37 @@ export default function CardItem({
   }
 
   return (
-    <div className="card">
-      <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
+  <div className="card">
+    <h2 className="card-title">⚙️ {item['Descrição'] || item['descrição'] || 'Item'}</h2>
+
+    {Object.entries(item).map(([chave, valor], i) => {
+      if (['Descrição', 'descrição', 'fotoUrl'].includes(chave)) return null;
+
+      const isDestaque = ['Tag', 'Potência', 'Código', 'Corrente', 'Tensão'].some(k =>
+        normalizeText(k) === normalizeText(chave)
+      );
+
+      return (
+        <div className={`card-item ${isDestaque ? 'destaque' : ''}`} key={i}>
+          <strong>{chave}:</strong> {valor}
+        </div>
+      );
+    })}
+
+    {/* 👉 IMAGEM AGORA AQUI EMBAIXO */}
+    <div style={{ marginTop: 10 }}>
       <img
         src={isImageValid ? imageUrl : 'caminho/para/imagem-padrao.jpg'}
         alt={`Foto do equipamento ${item['Descrição'] || item['descrição'] || ''}`}
         onError={handleImageError}
-        style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 10 }}
+        style={{ maxWidth: '30%', borderRadius: 8 }}
       />
-      {Object.entries(item).map(([chave, valor], i) => {
-        if (['Descrição', 'descrição', 'fotoUrl'].includes(chave)) return null;
-
-        const isDestaque = ['Tag', 'Potência', 'Código', 'Corrente', 'Tensão'].some(k =>
-          normalizeText(k) === normalizeText(chave)
-        );
-
-        return (
-          <div className={`card-item ${isDestaque ? 'destaque' : ''}`} key={i}>
-            <strong>{chave}:</strong> {valor}
-          </div>
-        );
-      })}
-      <div className="card-footer">
-        <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
-      </div>
     </div>
-  );
+
+    <div className="card-footer">
+      <button className="detalhes-btn" onClick={() => iniciarEdicao(index)}>Editar</button>
+    </div>
+  </div>
+);
+
 }
