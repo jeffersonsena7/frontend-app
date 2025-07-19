@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function EditForm({
   item,
@@ -12,6 +12,16 @@ export default function EditForm({
   setPreviewFoto
 }) {
   const [uploading, setUploading] = useState(false);
+
+   // Adicione este useEffect para sincronizar previewFoto com editData.fotoURL
+  useEffect(() => {
+    if (editData.fotoURL) {
+      setPreviewFoto(editData.fotoURL);
+    } else {
+      setPreviewFoto(null);
+    }
+  }, [editData.fotoURL]);
+
 
   const handleUploadFoto = async (file) => {
     if (!file) return;
